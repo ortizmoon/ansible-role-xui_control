@@ -1,0 +1,23 @@
+---
+## Task flags
+xui_control_deploy_cert: false
+xui_control_install_3xui: false
+xui_control_restore_db: false
+xui_control_add_backup_service: false
+xui_control_set_firewall: false
+
+## Systemd
+xui_control_systemd_units_path: /etc/systemd/system
+
+## Backup
+xui_control_backup_db_schedule: "*-*-* 04:00:00"
+xui_control_backup_db_script_path: /usr/local/bin/backup-db.sh
+xui_control_backup_db_service_description: "Backup x-ui database to R2"
+xui_control_backup_db_timer_description: "Daily database backup"
+xui_control_backup_db_persistent: true
+
+## X-UI
+xui_control_xui_service: x-ui
+xui_control_db_path: /etc/x-ui/x-ui.db
+xui_control_install_cmd: >-
+  bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)

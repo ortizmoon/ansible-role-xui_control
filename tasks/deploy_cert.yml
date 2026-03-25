@@ -1,0 +1,75 @@
+---
+- name: Set DNS A-records in Cloudflare
+  community.general.cloudflare_dns:
+    zone: "{{ main_domain }}"
+    record: "{{ item }}"
+    type: A
+    value: "{{ ansible_host }}"
+    ttl: 1
+    proxied: false
+    api_token: "{{ cf_api_token }}"
+    solo: true
+  loop:
+    - "{{ main_domain }}"
+    - "{{ xui_panel_domain }}"
+    - "{{ ssh_domain }}"
+
+- name: Wait for DNS propagation
+  ansible.builtin.pause:
+    seconds: 30
+
+- name: Install certbot
+  ansible.builtin.apt:
+    name:
+      - certbot
+      - python3-certbot-dns-cloudflare
+    state: present
+    update_cache: true
+
+- name: Write Cloudflare credentials
+  ansible.builtin.copy:
+    dest: /etc/letsencrypt/cloudflare.ini
+    content: "dns_cloudflare_api_token = {{ cf_api_token }}\n"
+    mode: "0600"
+  no_log: true
+
+- name: Check if cert exists
+  ansible.builtin.stat:
+    path: "/etc/letsencrypt/live/{{ main_domain }}/fullchain.pem"
+  register: _cert
+
+- name: Issue wildcard certificate
+  ansible.builtin.command:
+    cmd: >-
+      certbot certonly --non-interactive --agree-tos
+      --email {{ cf_email }}
+      --dns-cloudflare
+      --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini
+      --dns-cloudflare-propagation-seconds 60
+      -d {{ main_domain }} -d '*.{{ main_domain }}'
+  when: not _cert.stat.exists
+  changed_when: true
+
+- name: Deploy renewal hook
+  ansible.builtin.template:
+    src: renewal-hook.sh.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/bundle-and-reload.sh
+    mode: "0755"
+
+- name: Fix permissions on letsencrypt directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: "0755"
+  loop:
+    - /etc/letsencrypt/live
+    - "/etc/letsencrypt/live/{{ main_domain }}"
+    - /etc/letsencrypt/archive
+    - "/etc/letsencrypt/archive/{{ main_domain }}"
+
+- name: Build bundle.pem
+  ansible.builtin.shell:
+    cmd: >-
+      cat fullchain.pem privkey.pem > bundle.pem &&
+      chmod 600 bundle.pem
+    chdir: "/etc/letsencrypt/live/{{ main_domain }}"
+    creates: "/etc/letsencrypt/live/{{ main_domain }}/bundle.pem"

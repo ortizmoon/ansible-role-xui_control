@@ -1,0 +1,46 @@
+global
+    log stdout format raw local0
+
+defaults
+    log     global
+    mode    tcp
+    option  tcplog
+    timeout connect 5s
+    timeout client  30s
+    timeout server  30s
+    timeout tunnel  1h
+
+frontend ft_main
+    bind *:443
+    tcp-request inspect-delay 5s
+    tcp-request content accept if { req.ssl_hello_type 1 }
+
+    use_backend bk_xray    if { req.ssl_sni -i {{ vless_fake_domain }} }
+    use_backend bk_ssh_tls if { req.ssl_sni -i {{ ssh_domain }} }
+    use_backend bk_panel_tls if { req.ssl_sni -i {{ xui_panel_domain }} }
+
+frontend ft_ssh_unwrap
+    bind 127.0.0.1:4443 ssl crt /etc/letsencrypt/live/{{ main_domain }}/bundle.pem
+    default_backend bk_sshd
+
+frontend ft_panel_unwrap
+    bind 127.0.0.1:9443 ssl crt /etc/letsencrypt/live/{{ main_domain }}/bundle.pem
+    mode http
+    option httplog
+    default_backend bk_panel_http
+
+backend bk_xray
+    server xray 127.0.0.1:55555
+
+backend bk_ssh_tls
+    server loopback 127.0.0.1:4443
+
+backend bk_sshd
+    server sshd 127.0.0.1:22
+
+backend bk_panel_tls
+    server loopback 127.0.0.1:9443
+
+backend bk_panel_http
+    mode http
+    server panel 127.0.0.1:2053 ssl verify none

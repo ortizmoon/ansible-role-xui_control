@@ -1,0 +1,28 @@
+---
+- name: Deploy backup script
+  ansible.builtin.template:
+    src: backup-db.sh.j2
+    dest: "{{ xui_control_backup_db_script_path }}"
+    mode: "0700"
+  no_log: true
+
+- name: Deploy backup-db.service
+  ansible.builtin.template:
+    src: backup-db.service.j2
+    dest: "{{ xui_control_systemd_units_path }}/backup-db.service"
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Deploy backup-db.timer
+  ansible.builtin.template:
+    src: backup-db.timer.j2
+    dest: "{{ xui_control_systemd_units_path }}/backup-db.timer"
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Enable backup-db timer
+  ansible.builtin.systemd:
+    name: backup-db.timer
+    state: started
+    enabled: true
+    daemon_reload: true

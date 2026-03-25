@@ -1,0 +1,9 @@
+[Unit]
+Description={{ xui_control_backup_db_timer_description }}
+
+[Timer]
+OnCalendar={{ xui_control_backup_db_schedule }}
+Persistent={{ xui_control_backup_db_persistent | lower }}
+
+[Install]
+WantedBy=timers.target

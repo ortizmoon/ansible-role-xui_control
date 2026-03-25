@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  author: artem_p
+  description: Deploy 3x-ui vpn with haproxy and cloudflare dns
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Debian
+      versions:
+        - buster
+        - bullseye
+        - bookworm
+  galaxy_tags:
+    - vpn
+    - haproxy
+    - 3x_ui
+    - letsencrypt
+    - cloudflare
+dependencies: []

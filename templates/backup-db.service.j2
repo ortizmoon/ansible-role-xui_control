@@ -1,0 +1,27 @@
+[Unit]
+Description={{ xui_control_backup_db_service_description }}
+After=network-online.target x-ui.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart={{ xui_control_backup_db_script_path }}
+
+## Logs
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=backup-db
+
+## Timeouts
+TimeoutStartSec=300
+TimeoutStopSec=30
+
+User=root
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/etc/x-ui
+
+[Install]
+WantedBy=multi-user.target

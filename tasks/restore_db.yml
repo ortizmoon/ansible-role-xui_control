@@ -1,0 +1,58 @@
+---
+- name: Install Python boto3
+  ansible.builtin.package:
+    name: python3-boto3
+    state: present
+    update_cache: true
+
+- name: Stop x-ui service before restore
+  ansible.builtin.service:
+    name: "{{ xui_control_xui_service }}"
+    state: stopped
+  failed_when: false
+
+- name: List backups in R2
+  amazon.aws.s3_object:
+    bucket: "{{ r2_bucket }}"
+    mode: list
+    endpoint_url: "{{ r2_endpoint }}"
+    access_key: "{{ r2_access_key }}"
+    secret_key: "{{ r2_secret_key }}"
+  register: _s3_list
+  no_log: true
+
+- name: Filter and sort backups
+  ansible.builtin.set_fact:
+    _backup_files: >-
+      {{ _s3_list.s3_keys
+         | select('match', '^x-ui-.*\.db$')
+         | sort | list }}
+
+- name: Parse latest backup name
+  ansible.builtin.set_fact:
+    _latest_backup: "{{ _backup_files | last }}"
+  when: _backup_files | length > 0
+
+- name: Remove default database
+  ansible.builtin.file:
+    path: "{{ xui_control_db_path }}"
+    state: absent
+  when: _backup_files | default([]) | length > 0
+
+- name: Download latest backup from R2
+  amazon.aws.s3_object:
+    bucket: "{{ r2_bucket }}"
+    object: "{{ _latest_backup }}"
+    dest: "{{ xui_control_db_path }}"
+    mode: get
+    overwrite: always
+    endpoint_url: "{{ r2_endpoint }}"
+    access_key: "{{ r2_access_key }}"
+    secret_key: "{{ r2_secret_key }}"
+  when: _backup_files | default([]) | length > 0
+
+- name: Start x-ui service
+  ansible.builtin.service:
+    name: "{{ xui_control_xui_service }}"
+    state: started
+    enabled: true
