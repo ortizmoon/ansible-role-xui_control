@@ -53,7 +53,7 @@ Host vps
 ## Установка
 
 ```bash
-ansible-galaxy install artem_p.xui_control
+ansible-galaxy role install ortizmoon.xui_control
 ```
 
 ### Зависимости — коллекции:
@@ -67,6 +67,7 @@ ansible-galaxy collection install community.general amazon.aws community.crypto 
 ## Переменные
 
 ### Обязательные (задаются в `group_vars`)
+<br>
 
 **`main.yml`:**
 
@@ -81,6 +82,9 @@ ansible-galaxy collection install community.general amazon.aws community.crypto 
 | `r2_endpoint` | URL эндпоинта R2 | `https://xxxx.r2.cloudflarestorage.com` |
 | `firewall_rules` | Список правил UFW | см. ниже |
 
+<br>
+<br>
+
 **`creds.yml`** (хранить отдельно, не коммитить):
 
 | Переменная | Описание |
@@ -88,6 +92,8 @@ ansible-galaxy collection install community.general amazon.aws community.crypto 
 | `cf_api_token` | Cloudflare API-токен |
 | `r2_access_key` | R2 Access Key |
 | `r2_secret_key` | R2 Secret Key |
+
+<br>
 
 ### Флаги задач (по умолчанию `false`)
 
@@ -109,7 +115,7 @@ ansible-galaxy collection install community.general amazon.aws community.crypto 
   hosts: vps
   become: true
   roles:
-    - role: artem_p.xui_control
+    - role: ortizmoon.xui_control
       vars:
         xui_control_deploy_cert: true
         xui_control_install_3xui: true
@@ -149,7 +155,7 @@ r2_secret_key: "your_secret"
 
 ## Бэкап и восстановление vless конфигов
 
-Бэкап запускается ежедневно в **04:00** через systemd-таймер (расписание меняется через `xui_control_backup_db_schedule`).<br>
+Бэкап запускается ежедневно в **04:00** через systemd-таймер.<br>
 Файлы хранятся в R2 с именем `x-ui-YYYY-MM-DD_HHMMSS.db`.
 
 **Запустить бэкап вручную:**
