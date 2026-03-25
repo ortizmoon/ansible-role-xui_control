@@ -13,7 +13,7 @@ galaxy_info:
   galaxy_tags:
     - vpn
     - haproxy
-    - 3x_ui
+    - vless
     - letsencrypt
     - cloudflare
 dependencies: []
