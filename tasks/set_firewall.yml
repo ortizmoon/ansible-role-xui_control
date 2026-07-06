@@ -24,7 +24,7 @@
     port: "{{ item.port }}"
     proto: "{{ item.proto }}"
     comment: "{{ item.comment }}"
-  loop: "{{ firewall_rules }}"
+  loop: "{{ xui_control_firewall_rules }}"
 
 - name: Enable ufw
   community.general.ufw:

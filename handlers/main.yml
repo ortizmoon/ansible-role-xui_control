@@ -4,6 +4,11 @@
     name: haproxy
     state: restarted
 
+- name: Restart x-ui service
+  ansible.builtin.systemd:
+    name: "{{ xui_control_xui_service }}"
+    state: restarted
+
 - name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true

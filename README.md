@@ -111,16 +111,21 @@ ansible-galaxy collection install community.general amazon.aws community.crypto 
 ## Пример плейбука
 
 ```yaml
-- name: Deploy VPN
-  hosts: vps
+---
+- name: Deploy to new VPS
+  hosts: xui_server
   become: true
+  gather_facts: true
   roles:
-    - role: ortizmoon.xui_control
+    - role: xui_control
       vars:
         xui_control_deploy_cert: true
+        xui_control_restore_db: true
         xui_control_install_3xui: true
         xui_control_add_backup_service: true
         xui_control_set_firewall: true
+        xui_control_install_warp: true
+
 ```
 
 Пример `group_vars/main.yml`:
@@ -163,6 +168,16 @@ r2_secret_key: "your_secret"
 ```bash
 systemctl start backup-db.service
 ```
+
+<br>
+
+**Восстановить бэкап вручную:**
+
+```bash
+/usr/local/bin/x-ui-restore-r2.sh
+```
+
+
 
 <br>
 

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DB_PATH="{{ xui_control_db_path }}"
+SRC="r2:{{ r2_bucket }}"
+RCLONE_CONF=/root/.config/rclone/rclone.conf
+
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*"; }
+
+log "Listing backups in ${SRC}"
+LATEST=$(rclone ls "${SRC}" --include "**.db" --config "${RCLONE_CONF}" | sort -t/ -k2 | tail -1 | awk '{print $2}')
+
+if [ -z "${LATEST}" ]; then
+  log "ERROR: no backups found in ${SRC}"
+  exit 1
+fi
+
+log "Latest backup: ${LATEST}"
+
+log "Stopping {{ xui_control_xui_service }}"
+systemctl stop {{ xui_control_xui_service }} || log "WARNING: failed to stop service"
+sleep 3
+
+cleanup() {
+  log "Starting {{ xui_control_xui_service }}"
+  systemctl start {{ xui_control_xui_service }} || { log "ERROR: failed to start service"; exit 1; }
+}
+trap cleanup EXIT
+
+log "Wiping ${DB_PATH%/*}"
+rm -f "${DB_PATH%/*}"/*
+
+log "Downloading ${LATEST} to ${DB_PATH}"
+rclone copyto "${SRC}/${LATEST}" "${DB_PATH}" \
+  --config "${RCLONE_CONF}"
+log "Restore completed: ${LATEST}"

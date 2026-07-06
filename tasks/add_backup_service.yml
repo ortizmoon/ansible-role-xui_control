@@ -1,4 +1,17 @@
 ---
+- name: Ensure rclone config directory exists
+  ansible.builtin.file:
+    path: /root/.config/rclone
+    state: directory
+    mode: "0700"
+
+- name: Deploy rclone config
+  ansible.builtin.template:
+    src: rclone.conf.j2
+    dest: /root/.config/rclone/rclone.conf
+    mode: "0600"
+  no_log: true
+
 - name: Deploy backup script
   ansible.builtin.template:
     src: backup-db.sh.j2

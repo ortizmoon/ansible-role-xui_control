@@ -5,6 +5,7 @@ xui_control_install_3xui: false
 xui_control_restore_db: false
 xui_control_add_backup_service: false
 xui_control_set_firewall: false
+xui_control_install_warp: false
 
 ## Systemd
 xui_control_systemd_units_path: /etc/systemd/system
@@ -19,5 +20,19 @@ xui_control_backup_db_persistent: true
 ## X-UI
 xui_control_xui_service: x-ui
 xui_control_db_path: /etc/x-ui/x-ui.db
-xui_control_install_cmd: >-
-  bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
+xui_control_version: "v2.9.2"
+xui_control_script_url: "https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh"
+
+## Firewall
+xui_control_firewall_rules:
+  - port: 22
+    proto: tcp
+    comment: ssh
+
+  - port: 443
+    proto: tcp
+    comment: haproxy
+
+  - port: 22222
+    proto: tcp
+    comment: amneziavpn

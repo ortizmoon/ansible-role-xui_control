@@ -1,23 +1,4 @@
 ---
-- name: Set DNS A-records in Cloudflare
-  community.general.cloudflare_dns:
-    zone: "{{ main_domain }}"
-    record: "{{ item }}"
-    type: A
-    value: "{{ ansible_host }}"
-    ttl: 1
-    proxied: false
-    api_token: "{{ cf_api_token }}"
-    solo: true
-  loop:
-    - "{{ main_domain }}"
-    - "{{ xui_panel_domain }}"
-    - "{{ ssh_domain }}"
-
-- name: Wait for DNS propagation
-  ansible.builtin.pause:
-    seconds: 30
-
 - name: Install certbot
   ansible.builtin.apt:
     name:
