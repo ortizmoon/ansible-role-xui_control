@@ -13,6 +13,7 @@
     - "{{ main_domain }}"
     - "{{ xui_panel_domain }}"
     - "{{ ssh_domain }}"
+    - "{{ sub_domain }}"
 
 - name: Download cloudflare-warp gpg key
   ansible.builtin.get_url:
