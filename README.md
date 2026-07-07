@@ -1,15 +1,14 @@
-# xui_control
+# 3x-ui control
 
 Ansible-роль для автоматического развёртывания, или быстрой миграции, VLESS VPN-сервера.
 
 ---
 
 <p align="center">
-  <img src="https://img.shields.io/badge/3X--UI-VLESS-1E90FF?style=for-the-badge">
-  <img src="https://img.shields.io/badge/HAProxy-L4%20SNI%20Router-6A0DAD?style=for-the-badge&logo=haproxy">
-  <img src="https://img.shields.io/badge/Cloudflare-DNS--01-F38020?style=for-the-badge&logo=cloudflare">
-  <img src="https://img.shields.io/badge/Cloudflare-R2%20Bucket-F38020?style=for-the-badge&logo=cloudflare">
-</p>
+  <img src="https://img.shields.io/badge/3X--UI-1E90FF?style=for-the-badge">
+  <img src="https://img.shields.io/badge/HAProxy-6A0DAD?style=for-the-badge&logo=haproxy">
+  <img src="https://img.shields.io/badge/Cloudflare-DNS--01/WARP/R2%20Bucket-F38020?style=for-the-badge&logo=cloudflare">
+
 
 Устанавливает [3X-UI](https://github.com/mhsanaei/3x-ui) за HAProxy L4 балансировщиком,<br>
 выпускает wildcard TLS-сертификаты через Certbot + Cloudflare DNS-01,<br>
@@ -82,12 +81,11 @@ ansible-galaxy collection install community.general amazon.aws community.crypto 
 | `cf_email` | Email аккаунта Cloudflare | `you@example.com` |
 | `r2_bucket` | Имя R2-бакета | `my-bucket` |
 | `r2_endpoint` | URL эндпоинта R2 | `https://xxxx.r2.cloudflarestorage.com` |
-| `firewall_rules` | Список правил UFW | см. ниже |
 
 <br>
 <br>
 
-**`creds.yml`** (хранить отдельно, не коммитить):
+**`creds.yml`** :
 
 | Переменная | Описание |
 |---|---|
@@ -149,14 +147,6 @@ firewall_rules:
   - port: 443
     proto: tcp
     comment: haproxy
-```
-
-Пример `group_vars/creds.yml`:
-
-```yaml
-cf_api_token: "your_token"
-r2_access_key: "your_key"
-r2_secret_key: "your_secret"
 ```
 
 <br>
