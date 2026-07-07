@@ -32,7 +32,3 @@ xui_control_firewall_rules:
   - port: 443
     proto: tcp
     comment: haproxy
-
-  - port: 22222
-    proto: tcp
-    comment: amneziavpn
